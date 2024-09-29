@@ -3,7 +3,9 @@ import { TIngredient, TOrder, TOrdersData, TUser } from './types';
 
 const URL = process.env.BURGER_API_URL;
 
-const checkResponse = <T>(res: Response): Promise<T> =>
+const checkResponse = <T>(
+  res: Response
+): Promise<T> =>  // проверка вспомогательная ответа с сервера
   res.ok ? res.json() : res.json().then((err) => Promise.reject(err));
 
 type TServerResponse<T> = {
@@ -15,7 +17,7 @@ type TRefreshResponse = TServerResponse<{
   accessToken: string;
 }>;
 
-export const refreshToken = (): Promise<TRefreshResponse> =>
+export const refreshToken = (): Promise<TRefreshResponse> => // метод обновления access токена
   fetch(`${URL}/auth/token`, {
     method: 'POST',
     headers: {
@@ -39,6 +41,7 @@ export const fetchWithRefresh = async <T>(
   url: RequestInfo,
   options: RequestInit
 ) => {
+  // / рефреш токена (обновляяет access токен через 30 мин запросом, чтобы пользователь не входил заново в акк)
   try {
     const res = await fetch(url, options);
     return await checkResponse<T>(res);
@@ -87,6 +90,10 @@ export const getFeedsApi = () =>
       return Promise.reject(data);
     });
 
+// getFeedsApi().then((data) => {
+//   console.log(data);
+// });
+
 export const getOrdersApi = () =>
   fetchWithRefresh<TFeedsResponse>(`${URL}/orders`, {
     method: 'GET',
@@ -98,6 +105,10 @@ export const getOrdersApi = () =>
     if (data?.success) return data.orders;
     return Promise.reject(data);
   });
+
+// getOrdersApi().then((data) => {
+//   console.log(data);
+// });
 
 type TNewOrderResponse = TServerResponse<{
   order: TOrder;
@@ -143,7 +154,9 @@ type TAuthResponse = TServerResponse<{
   user: TUser;
 }>;
 
-export const registerUserApi = (data: TRegisterData) =>
+export const registerUserApi = (
+  data: TRegisterData // регистрация аккаунта
+) =>
   fetch(`${URL}/auth/register`, {
     method: 'POST',
     headers: {
@@ -162,7 +175,9 @@ export type TLoginData = {
   password: string;
 };
 
-export const loginUserApi = (data: TLoginData) =>
+export const loginUserApi = (
+  data: TLoginData // авторизация
+) =>
   fetch(`${URL}/auth/login`, {
     method: 'POST',
     headers: {
@@ -176,7 +191,9 @@ export const loginUserApi = (data: TLoginData) =>
       return Promise.reject(data);
     });
 
-export const forgotPasswordApi = (data: { email: string }) =>
+export const forgotPasswordApi = (
+  data: { email: string } //
+) =>
   fetch(`${URL}/password-reset`, {
     method: 'POST',
     headers: {
@@ -207,6 +224,7 @@ export const resetPasswordApi = (data: { password: string; token: string }) =>
 type TUserResponse = TServerResponse<{ user: TUser }>;
 
 export const getUserApi = () =>
+  // запрос на роут аутентификацию
   fetchWithRefresh<TUserResponse>(`${URL}/auth/user`, {
     headers: {
       authorization: getCookie('accessToken')
