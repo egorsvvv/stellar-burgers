@@ -90,10 +90,6 @@ export const getFeedsApi = () =>
       return Promise.reject(data);
     });
 
-// getFeedsApi().then((data) => {
-//   console.log(data);
-// });
-
 export const getOrdersApi = () =>
   fetchWithRefresh<TFeedsResponse>(`${URL}/orders`, {
     method: 'GET',
@@ -105,10 +101,6 @@ export const getOrdersApi = () =>
     if (data?.success) return data.orders;
     return Promise.reject(data);
   });
-
-// getOrdersApi().then((data) => {
-//   console.log(data);
-// });
 
 type TNewOrderResponse = TServerResponse<{
   order: TOrder;

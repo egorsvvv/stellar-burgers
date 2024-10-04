@@ -12,30 +12,16 @@ import {
 import { useParams } from 'react-router-dom';
 
 export const OrderInfo: FC = () => {
-  /** TODO: взять переменные orderData и ingredients из стора */
-  // const orderData = {
-  //   createdAt: '',
-  //   ingredients: [],
-  //   _id: '',
-  //   status: '',
-  //   name: '',
-  //   updatedAt: 'string',
-  //   number: 0
-  // };
   const dispatch = useDispatch();
   const activeNumber = Number(useParams().number);
   const orderData = useSelector(selectOrders);
   useEffect(() => {
-    // Очищаем предыдущие данные заказа перед отправкой нового запроса
     dispatch(clearOrders());
-
-    // Делаем новый запрос на получение данных по номеру заказа
     dispatch(retrieveOrderByNumber(activeNumber));
   }, [dispatch, activeNumber]);
 
   const ingredients: TIngredient[] = useSelector(selectIngridient);
 
-  /* Готовим данные для отображения */
   const orderInfo = useMemo(() => {
     if (!orderData || !ingredients.length) return null;
 
