@@ -10,16 +10,9 @@ import {
   selectMain,
   getIngredients
 } from '../../services/slices/burgerIngridientsSlices';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../services/store';
 
 export const BurgerIngredients: FC = () => {
   /** TODO: взять переменные из стора */
-  const dispatch = useDispatch<AppDispatch>();
-
-  useEffect(() => {
-    dispatch(getIngredients());
-  }, [dispatch]);
 
   const buns = useSelector(selectBuns);
   const mains = useSelector(selectMain);

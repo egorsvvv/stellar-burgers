@@ -11,7 +11,7 @@ import {
 } from '@pages';
 import '../../index.css';
 import styles from './app.module.css';
-import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import { Routes, Route, BrowserRouter, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store, { useDispatch } from '../../services/store';
 import { AppHeader, OrderInfo, Modal, IngredientDetails } from '@components';
@@ -19,6 +19,7 @@ import ProtectedRoute from '../protected-route/protected-route';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { checkUserAuth } from '../../services/slices/registerUser';
+import { getIngredients } from '../../services/slices/burgerIngridientsSlices';
 
 const ModalWithNavigate = ({
   children,
@@ -28,12 +29,7 @@ const ModalWithNavigate = ({
   title: string;
 }) => {
   const navigate = useNavigate();
-
-  // Функция для закрытия модального окна и возврата на предыдущую страницу
-  const onClose = () => {
-    navigate(-1);
-  };
-
+  const onClose = () => navigate(-1);
   return (
     <Modal title={title} onClose={onClose}>
       {children}
@@ -41,11 +37,15 @@ const ModalWithNavigate = ({
   );
 };
 
-// Основной контент приложения с логикой маршрутов
 const AppContent = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
+  const backgroundLocation = location.state?.background;
 
-  // Проверяем авторизацию пользователя при монтировании компонента
+  useEffect(() => {
+    dispatch(getIngredients());
+  }, [dispatch]);
+
   useEffect(() => {
     dispatch(checkUserAuth());
   }, [dispatch]);
@@ -53,8 +53,9 @@ const AppContent = () => {
   return (
     <div className={styles.app}>
       <AppHeader />
-      <Routes>
-        {/* Основные страницы */}
+
+      {/* Основные маршруты */}
+      <Routes location={backgroundLocation || location}>
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
         <Route path='/login' element={<Login />} />
@@ -62,10 +63,23 @@ const AppContent = () => {
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/reset-password' element={<ResetPassword />} />
 
-        {/* Защищенные маршруты для авторизованных пользователей */}
+        {/* Защищенные маршруты */}
         <Route element={<ProtectedRoute />}>
           <Route path='/profile' element={<Profile />} />
           <Route path='/profile/orders' element={<ProfileOrders />} />
+          <Route path='/profile/orders/:number' element={<OrderInfo />} />
+        </Route>
+
+        <Route path='/feed/:number' element={<OrderInfo />} />
+        <Route path='/ingredients/:id' element={<IngredientDetails />} />
+
+        {/* Обработка несуществующих маршрутов */}
+        <Route path='*' element={<NotFound404 />} />
+      </Routes>
+
+      {/* Модальные маршруты */}
+      {backgroundLocation && (
+        <Routes>
           <Route
             path='/profile/orders/:number'
             element={
@@ -74,34 +88,28 @@ const AppContent = () => {
               </ModalWithNavigate>
             }
           />
-        </Route>
-
-        {/* Маршруты для модальных окон */}
-        <Route
-          path='/feed/:number'
-          element={
-            <ModalWithNavigate title='Детали заказа'>
-              <OrderInfo />
-            </ModalWithNavigate>
-          }
-        />
-        <Route
-          path='/ingredients/:id'
-          element={
-            <ModalWithNavigate title='Детали ингредиента'>
-              <IngredientDetails />
-            </ModalWithNavigate>
-          }
-        />
-
-        {/* Обработка несуществующих маршрутов */}
-        <Route path='*' element={<NotFound404 />} />
-      </Routes>
+          <Route
+            path='/feed/:number'
+            element={
+              <ModalWithNavigate title='Детали заказа'>
+                <OrderInfo />
+              </ModalWithNavigate>
+            }
+          />
+          <Route
+            path='/ingredients/:id'
+            element={
+              <ModalWithNavigate title='Детали ингредиента'>
+                <IngredientDetails />
+              </ModalWithNavigate>
+            }
+          />
+        </Routes>
+      )}
     </div>
   );
 };
 
-// Главный компонент App, оборачивающий приложение в Provider и BrowserRouter
 const App = () => (
   <Provider store={store}>
     <BrowserRouter>

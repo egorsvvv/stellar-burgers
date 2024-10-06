@@ -9,18 +9,12 @@ import {
   getIngredients,
   selectIngridient
 } from '../../services/slices/burgerIngridientsSlices';
-import { useDispatch } from '../../services/store';
 
 const maxIngredients = 6;
 
 export const OrderCard: FC<OrderCardProps> = memo(({ order }) => {
   const location = useLocation();
 
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getIngredients());
-  }, [dispatch]);
   const ingredients: TIngredient[] = useSelector(selectIngridient);
 
   const orderInfo = useMemo(() => {

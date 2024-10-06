@@ -49,17 +49,15 @@ export const getUser = createAsyncThunk('auth/user', async () => {
   return response;
 });
 
-export const logoutUser = createAsyncThunk('aut/logout', (_, { dispatch }) => {
-  logoutApi()
-    .then(() => {
-      localStorage.clear();
-      deleteCookie('accessToken');
-      dispatch(userLogout());
-    })
-    .catch(() => {
-      console.log('Ошибка выполнения выхода');
-    });
-});
+export const logoutUser = createAsyncThunk(
+  'auth/logout',
+  async (_, { dispatch }) => {
+    await logoutApi(); // Обязательно дождитесь завершения
+    localStorage.clear();
+    deleteCookie('accessToken');
+    dispatch(userLogout());
+  }
+);
 
 export const updateUser = createAsyncThunk(
   'auth/user',
@@ -75,9 +73,12 @@ export const userSlice = createSlice({
   reducers: {
     authChecked: (state) => {
       state.isAuth = true;
+      state.loading = false;
     },
     userLogout: (state) => {
       state.user = null;
+      state.isAuth = false;
+      state.loading = false;
     },
     userUpdate: (state, action) => {
       state.user = action.payload.user;
@@ -129,9 +130,18 @@ export const userSlice = createSlice({
       .addCase(getUser.rejected, (state, action) => {
         state.error = action.error.message || null;
         state.isAuth = false;
+        state.loading = false;
       })
       .addCase(logoutUser.fulfilled, (state, action) => {
         state.user = null;
+        state.isAuth = false;
+        state.loading = false;
+      })
+      .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+        state.isAuth = false;
+      })
+      .addCase(logoutUser.rejected, (state) => {
         state.isAuth = false;
       });
   },
@@ -139,7 +149,8 @@ export const userSlice = createSlice({
     selectName: (state) => state.user?.name,
     selectEmail: (state) => state.user?.email,
     selectAuth: (state) => state.isAuth,
-    selectUser: (state) => state.user
+    selectUser: (state) => state.user,
+    selectLoading: (state) => state.loading
   }
 });
 
@@ -158,7 +169,12 @@ export const checkUserAuth = createAsyncThunk(
 
 export const { authChecked, userLogout, userUpdate } = userSlice.actions;
 
-export const { selectName, selectEmail, selectAuth, selectUser } =
-  userSlice.selectors;
+export const {
+  selectName,
+  selectEmail,
+  selectAuth,
+  selectUser,
+  selectLoading
+} = userSlice.selectors;
 
 export default userSlice.reducer;
