@@ -5,16 +5,18 @@ import {
   selectEmail,
   selectName,
   getUser,
-  updateUser
+  updateUser,
+  selectLoading
 } from '../../services/slices/registerUser';
+import { Preloader } from '@ui';
 
 export const Profile: FC = () => {
   /** TODO: взять переменную из стора */
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(getUser());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(getUser());
+  // }, [dispatch]);
 
   const name = useSelector(selectName) || '';
   const email = useSelector(selectEmail) || '';

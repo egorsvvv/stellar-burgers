@@ -21,7 +21,7 @@ export const inititalState: TUserSliceState = {
   user: null,
   error: null,
   isAuth: false,
-  loading: false
+  loading: true
 };
 
 export const registerUser = createAsyncThunk(
@@ -52,7 +52,7 @@ export const getUser = createAsyncThunk('auth/user', async () => {
 export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { dispatch }) => {
-    await logoutApi(); // Обязательно дождитесь завершения
+    await logoutApi();
     localStorage.clear();
     deleteCookie('accessToken');
     dispatch(userLogout());
@@ -72,7 +72,7 @@ export const userSlice = createSlice({
   initialState: inititalState,
   reducers: {
     authChecked: (state) => {
-      state.isAuth = true;
+      state.isAuth = Boolean(state.user);
       state.loading = false;
     },
     userLogout: (state) => {
@@ -87,8 +87,8 @@ export const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.pending, (state) => {
-        state.error = null;
         state.loading = true;
+        state.error = null;
         state.user = null;
       })
       .addCase(registerUser.rejected, (state, action) => {
@@ -117,9 +117,8 @@ export const userSlice = createSlice({
         state.isAuth = false;
       })
       .addCase(getUser.pending, (state) => {
-        state.error = null;
         state.loading = true;
-        state.user = null;
+        state.error = null;
       })
       .addCase(getUser.fulfilled, (state, action) => {
         state.isAuth = true;
@@ -128,11 +127,11 @@ export const userSlice = createSlice({
         state.loading = false;
       })
       .addCase(getUser.rejected, (state, action) => {
-        state.error = action.error.message || null;
         state.isAuth = false;
         state.loading = false;
+        state.error = action.error.message || null;
       })
-      .addCase(logoutUser.fulfilled, (state, action) => {
+      .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.isAuth = false;
         state.loading = false;
@@ -143,6 +142,7 @@ export const userSlice = createSlice({
       })
       .addCase(logoutUser.rejected, (state) => {
         state.isAuth = false;
+        state.loading = false;
       });
   },
   selectors: {

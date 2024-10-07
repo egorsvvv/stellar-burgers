@@ -10,11 +10,20 @@ import { Preloader } from '@ui';
 const ProtectedRoute = () => {
   const auth = useSelector(selectAuth);
   const loading = useSelector(selectLoading);
+  const location = useLocation();
 
-  // if (loading) {
-  //   return <Preloader />;
-  // }
-  return auth ? <Outlet /> : <Navigate to='login' />;
+  // Пока идет проверка, показываем прелоадер
+  if (loading) {
+    return <Preloader />;
+  }
+
+  // Если пользователь не авторизован, направляем на страницу логина, сохраняя предыдущий URL для редиректа
+  if (!auth) {
+    return <Navigate to='/login' state={{ from: location }} replace />;
+  }
+
+  // Если авторизация подтверждена, рендерим дочерние компоненты
+  return <Outlet />;
 };
 
 export default ProtectedRoute;
