@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { TUser } from '@utils-types';
-import { TLoginData, TRegisterData } from '@api';
+import { TLoginData, TRegisterData } from '../../utils/burger-api';
 import {
   registerUserApi,
   loginUserApi,
   getUserApi,
   updateUserApi,
   logoutApi
-} from '@api';
+} from '../../utils/burger-api';
 import { setCookie, getCookie, deleteCookie } from '../../utils/cookie';
 
 type TUserSliceState = {

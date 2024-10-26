@@ -12,7 +12,7 @@ type TBurgerConstructorSlice = {
   index: number;
 };
 
-const initialState: TBurgerConstructorSlice = {
+export const initialState: TBurgerConstructorSlice = {
   constructorItems: {
     ingredients: [],
     bun: null
