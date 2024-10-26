@@ -8,7 +8,7 @@ type TBurgerIngridientsSlice = {
   error: string | null;
 };
 
-const initialState: TBurgerIngridientsSlice = {
+export const initialState: TBurgerIngridientsSlice = {
   ingredients: [],
   isLoading: false,
   error: null

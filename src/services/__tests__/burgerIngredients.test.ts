@@ -1,13 +1,8 @@
 import ingredientsReducer, {
-  getIngredients
+  getIngredients,
+  initialState
 } from '../slices/burgerIngridientsSlices';
 import { TIngredient } from '@utils-types';
-
-const initialState = {
-  ingredients: [],
-  isLoading: false,
-  error: null
-};
 
 // Моки данных
 const mockIngredients: TIngredient[] = [
